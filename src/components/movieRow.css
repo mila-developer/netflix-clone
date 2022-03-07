@@ -31,7 +31,8 @@
   transform: scale(1);
 }
 
-.movieRow--left, .movieRow--right{
+.movieRow--left, 
+.movieRow--right{
   position: absolute;
   width: 40px;
   height: 225px;
@@ -61,7 +62,8 @@
 }
 
 @media (max-width:760px){
-  .movieRow--left, .movieRow--right{
+  .movieRow--left, 
+  .movieRow--right{
     opacity: 1;
   }
 }
