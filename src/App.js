@@ -1,9 +1,28 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import tmdb from './tmdb';
 
 export default () => {
-  return (
-    <div> 
+  const [movieList, setMovieList] = useState([]);
 
+  useEffect(() => {
+    const loadAll = async () => {
+      // Get the total list
+      let list = await tmdb.getHomeList();
+      setMovieList(list);
+    }
+
+    loadAll();
+  }, []);
+
+  return (
+    <div className='page'> 
+      <section className='lists'>
+        {movieList.map((item, key) => (
+          <div>
+            {item.title}
+          </div>
+        ))}
+      </section>  
     </div>
   );
 }
