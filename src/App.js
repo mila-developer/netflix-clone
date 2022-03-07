@@ -1,40 +1,73 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Tmdb from './Tmdb';
-import MovieRow from './components/MovieRow';
+
 import FeaturedMovie from './components/FeaturedMovie';
+import MovieRow from './components/MovieRow';
+import Header from './components/Header/index';
 
-export default () => {
+function App() {
 
-  const [movieList, setMovieList] = useState([]);
-  const [featuredData, setFeaturedData] = useState(null);
+  const [movieList,setMovieList] = useState([]);
+  const [featuredData, setFeaturedData] =  useState(null);
+  const [blackHeader, setBlackHeader] = useState(false);
 
-  useEffect(() => {
+  useEffect(()=>{
     const loadAll = async () => {
-      // Get the total list
-      let list = await Tmdb.getHomeList();
-      setMovieList(list);
+      // Get the list 
+      let list = await Tmdb.getHomeList()
+      setMovieList(list)
 
-      // Get featured
-      let originals = list.filter(i=>i.slug === 'originals');
-      let randomChosen = Math.floor(Math.random() * (originals[0].items.results.length -1));
+      //Get featured 
+      let originals = list.filter(i=> i.slug === 'originals' )
+      let randomChosen = Math.floor(Math.random() * (originals[0].items.results.length - 1)) 
+      let chosen = originals[0].items.results[randomChosen]
+      let chosenInfo = await Tmdb.getMovieInfo(chosen.id, 'tv')
+
+      setFeaturedData(chosenInfo)
     }
+    loadAll()
+  },[])
 
-    loadAll();
-  }, []);
+  useEffect(()=>{
+    const scrollListener = () =>{
+      if(window.scrollY > 10) setBlackHeader(true)
+      else setBlackHeader(false)
+    }
+    window.addEventListener("scroll", scrollListener)
+    return () => {
+      window.removeEventListener("scroll", scrollListener)
+    }
+  },[])
 
   return (
     <div className="page">
 
-      {featuredData &&
-        <FeaturedMovie item={featuredData} />
-      }
+      <Header black={blackHeader}/>
 
-      <section className="lists">
-        {movieList.map((item, key) => (
-          <MovieRow key={key} title={item.title} items={item.items} />
+        {featuredData && 
+          <FeaturedMovie item={featuredData}/>
+        }
+
+       <section className="lists">
+        {movieList.map((item,key)=>(
+          <MovieRow key={key} title={item.title} items={item.items}  />
         ))}
-      </section>  
+       </section>
+
+       <footer>
+         <p>Made with <span role="img" aria-label="heart">❤</span> by Camila Abreu</p>
+         <p>Image rights for Netflix</p>
+         <p>Data taken by the website Themoviedb.org</p>
+       </footer>
+
+      {movieList.length <= 0 &&
+       <div className="loading">
+          <img src="https://media.filmelier.com/noticias/br/2020/03/Netflix_LoadTime.gif" alt="loading"/>
+       </div>
+      }
     </div>
   );
 }
+
+export default App;
